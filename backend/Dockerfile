@@ -22,9 +22,6 @@ RUN poetry config virtualenvs.create false \
 # Copy application code
 COPY . .
 
-# Copy ops scripts for seeding
-COPY ../ops /app/ops
-
 # Expose port
 EXPOSE 8000
 
