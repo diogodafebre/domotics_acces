@@ -1,0 +1,53 @@
+name: move_acces
+description: Move Acces mobile application
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing
+  go_router: ^13.2.0
+
+  # HTTP client
+  dio: ^5.4.0
+
+  # Secure storage
+  flutter_secure_storage: ^9.0.0
+
+  # WebSocket
+  web_socket_channel: ^2.4.0
+
+  # Local database
+  drift: ^2.14.1
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.2
+  path: ^1.8.3
+
+  # UI
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  # Code generation
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.10
+  drift_dev: ^2.14.1
+
+  # Linting
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,34 @@
+# Development Caddyfile (no TLS)
+
+:8080 {
+    # API reverse proxy
+    reverse_proxy api:8000
+
+    # CORS headers
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Authorization, Content-Type"
+    }
+
+    # Health check
+    handle /health {
+        reverse_proxy api:8000
+    }
+
+    # Metrics (internal only in prod)
+    handle /metrics {
+        reverse_proxy api:8000
+    }
+
+    # All other routes
+    handle {
+        reverse_proxy api:8000
+    }
+
+    # Logging
+    log {
+        output stdout
+        format console
+    }
+}

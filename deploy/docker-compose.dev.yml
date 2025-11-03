@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: move-acces-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-move_acces}
+      MYSQL_USER: ${DB_USER:-appuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-apppassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: move-acces-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # FastAPI Backend
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: move-acces-api
+    environment:
+      DB_URL: mysql+asyncmy://${DB_USER:-appuser}:${DB_PASSWORD:-apppassword}@mysql:3306/${DB_NAME:-move_acces}
+      REDIS_URL: redis://redis:6379/0
+      APP_SECRET: ${APP_SECRET:-change_me_secret_key_min_32_chars_long}
+      ACCESS_TOKEN_TTL_MIN: ${ACCESS_TOKEN_TTL_MIN:-15}
+      REFRESH_TOKEN_TTL_HOURS: ${REFRESH_TOKEN_TTL_HOURS:-24}
+      RATE_LIMIT_LOGIN_PER_MIN: ${RATE_LIMIT_LOGIN_PER_MIN:-5}
+      RATE_LIMIT_API_PER_5MIN: ${RATE_LIMIT_API_PER_5MIN:-100}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:3000}
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - public
+    volumes:
+      - ../backend:/app
+      - ../ops:/app/ops
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        alembic upgrade head &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # Caddy Reverse Proxy
+  caddy:
+    image: caddy:2-alpine
+    container_name: move-acces-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - public
+    depends_on:
+      - api
+
+networks:
+  internal:
+    driver: bridge
+    internal: true
+  public:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  caddy_data:
+  caddy_config:

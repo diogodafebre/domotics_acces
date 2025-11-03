@@ -1,0 +1,50 @@
+# Production Caddyfile with automatic TLS
+
+{$CADDY_DOMAIN:api.yourdomain.com} {
+    # Automatic HTTPS
+    tls {$CADDY_EMAIL:admin@yourdomain.com}
+
+    # API reverse proxy
+    reverse_proxy api:8000 {
+        # Health checks
+        health_uri /health
+        health_interval 10s
+        health_timeout 5s
+    }
+
+    # Security headers
+    header {
+        # Remove server info
+        -Server
+
+        # Security headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Rate limiting (basic)
+    rate_limit {
+        zone dynamic {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
+
+    # Logging
+    log {
+        output file /data/access.log {
+            roll_size 100mb
+            roll_keep 10
+        }
+        format json
+    }
+
+    # Error handling
+    handle_errors {
+        respond "{http.error.status_code} {http.error.status_text}"
+    }
+}

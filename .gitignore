@@ -1,0 +1,48 @@
+# Root
+.env
+*.log
+*.tmp
+
+# Backend
+backend/.env
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/*.egg-info/
+backend/dist/
+backend/build/
+backend/.venv/
+backend/venv/
+backend/alembic/versions/*.py
+!backend/alembic/versions/__init__.py
+
+# Mobile
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/build/
+mobile/.idea/
+mobile/.vscode/
+mobile/*.iml
+mobile/.metadata
+mobile/pubspec.lock
+mobile/.env
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
