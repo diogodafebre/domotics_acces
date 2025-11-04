@@ -1,0 +1,93 @@
+=============================================================================
+COMMANDES POWERSHELL - DOMOTICS ACCESS V1
+=============================================================================
+
+TERMINAL 1 - BACKEND
+=============================================================================
+
+# 1. Naviguer vers le dossier backend
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\backend
+
+# 2. Activer l'environnement virtuel Python
+.\venv\Scripts\Activate.ps1
+
+# 3. Importer les données de test dans MySQL
+Get-Content seed_fixed.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p move_acces
+
+# 4. Vérifier que l'import a fonctionné (optionnel)
+& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p -e "SELECT user_email, user_nom, user_prenom FROM users WHERE user_email='test@example.com';" move_acces
+
+# 5. Lancer le serveur FastAPI
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# ✅ Backend doit afficher : "Uvicorn running on http://0.0.0.0:8000"
+# ✅ Tester dans le navigateur : http://localhost:8000/docs
+# ⚠️ LAISSER CE TERMINAL OUVERT
+
+
+=============================================================================
+TERMINAL 2 - FLUTTER (Ouvrir un NOUVEAU terminal)
+=============================================================================
+
+# 1. Naviguer vers le dossier app
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\app
+
+# 2. Installer les dépendances Flutter
+flutter pub get
+
+# 3. Vérifier les devices disponibles
+flutter devices
+
+# 4a. Si ÉMULATEUR ANDROID (recommandé)
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+
+# 4b. Si DEVICE PHYSIQUE connecté en USB
+# D'abord trouver votre IP :
+ipconfig
+# Chercher "Adresse IPv4" (ex: 192.168.1.100)
+# Puis lancer avec VOTRE IP :
+flutter run --dart-define=API_BASE_URL=http://VOTRE_IP:8000
+
+
+=============================================================================
+TEST DE L'APPLICATION
+=============================================================================
+
+Identifiants de test :
+📧 Email : test@example.com
+🔑 Mot de passe : admin
+
+Scénario :
+1. Entrer les identifiants
+2. Cliquer "Se connecter"
+3. Dashboard s'affiche avec "Bienvenue, Alice Dupont"
+4. Tirer vers le bas pour refresh
+5. Cliquer "Se déconnecter"
+
+
+=============================================================================
+RACCOURCIS
+=============================================================================
+
+Backend seul (Terminal 1) :
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\backend
+.\venv\Scripts\Activate.ps1
+Get-Content seed_fixed.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p move_acces
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+Flutter seul (Terminal 2) :
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\app
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+
+
+=============================================================================
+NOTES IMPORTANTES
+=============================================================================
+
+- Le backend DOIT tourner AVANT de lancer Flutter
+- Pour émulateur Android : utiliser http://10.0.2.2:8000
+- Pour device physique : utiliser http://VOTRE_IP_LOCALE:8000
+- Trouver votre IP avec : ipconfig (chercher "Adresse IPv4")
+- MySQL doit être démarré (vérifier avec : Get-Service MySQL*)
+- Si erreur sur seed_fixed.sql, les données existent déjà (c'est OK)

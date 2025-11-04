@@ -13,7 +13,8 @@ class UserProfile(BaseModel):
     rue: str | None = None
     npa: str | None = None
     localite: str | None = None
-    tel: str | None = None
+    telephone: str | None = None
+    mobile: str | None = None
 
     class Config:
         from_attributes = True

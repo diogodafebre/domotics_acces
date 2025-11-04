@@ -29,7 +29,7 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     4. Return JWT tokens + user info
     """
     # 1. Find credentials in acces_app
-    acces = db.query(AccesApp).filter(AccesApp.email == credentials.email).first()
+    acces = db.query(AccesApp).filter(AccesApp.user_email == credentials.email).first()
     if not acces:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -37,14 +37,14 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         )
 
     # 2. Verify password
-    if not verify_password(credentials.password, acces.password_hash):
+    if not verify_password(credentials.password, acces.acces_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
 
     # 3. Get user profile from users table
-    user = db.query(User).filter(User.email == credentials.email).first()
+    user = db.query(User).filter(User.user_email == credentials.email).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -52,8 +52,8 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         )
 
     # 4. Create JWT tokens
-    access_token = create_access_token(user.user_id, user.email or credentials.email)
-    refresh_token = create_refresh_token(user.user_id, user.email or credentials.email)
+    access_token = create_access_token(user.user_id, user.user_email or credentials.email)
+    refresh_token = create_refresh_token(user.user_id, user.user_email or credentials.email)
 
     # 5. Return response
     return LoginResponse(
@@ -61,9 +61,9 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         refresh=refresh_token,
         user=UserInfo(
             id=user.user_id,
-            email=user.email or credentials.email,
-            prenom=user.prenom,
-            nom=user.nom
+            email=user.user_email or credentials.email,
+            prenom=user.user_prenom,
+            nom=user.user_nom
         )
     )
 
@@ -109,7 +109,7 @@ def get_me(current_user: User = Depends(get_current_user)):
     """
     return UserBasic(
         id=current_user.user_id,
-        email=current_user.email,
-        prenom=current_user.prenom,
-        nom=current_user.nom
+        email=current_user.user_email,
+        prenom=current_user.user_prenom,
+        nom=current_user.user_nom
     )
