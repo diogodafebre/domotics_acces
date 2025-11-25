@@ -1,0 +1,64 @@
+=============================================================================
+COMMANDES SIMPLIFIÉES - LOGIN + PAGE DE SUCCÈS
+=============================================================================
+
+✅ Le backend vérifie les identifiants dans MySQL
+✅ Si correct → Page "BRAVO ! Vous avez réussi"
+✅ Si incorrect → Message d'erreur
+
+=============================================================================
+TERMINAL 1 - BACKEND
+=============================================================================
+
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\backend
+.\venv\Scripts\Activate.ps1
+Get-Content seed_fixed.sql | & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p move_acces
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+⚠️ LAISSER CE TERMINAL OUVERT
+
+
+=============================================================================
+TERMINAL 2 - FLUTTER
+=============================================================================
+
+cd C:\Users\diogo\Documents\BACHELOR\Domotics-Acces\app
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
+
+
+=============================================================================
+TEST
+=============================================================================
+
+📧 Email : test@example.com
+🔑 Mot de passe : admin
+
+➡️ Cliquer "Se connecter"
+✅ Page affiche : "BRAVO ! Vous avez réussi"
+✅ Avec votre nom : Alice Dupont
+
+
+=============================================================================
+CE QUI SE PASSE
+=============================================================================
+
+1. Vous entrez email + mot de passe dans l'app Flutter
+2. Flutter envoie les données au backend (POST /auth/login)
+3. Backend vérifie dans MySQL :
+   - Table acces_app : vérification du mot de passe (bcrypt)
+   - Table users : récupération du nom/prénom
+4. Si OK : Backend renvoie un token JWT + infos utilisateur
+5. Flutter affiche : "BRAVO ! Vous avez réussi" + votre nom
+6. Si KO : Message d'erreur "Identifiants invalides"
+
+
+=============================================================================
+NOTES
+=============================================================================
+
+- Backend vérifie VRAIMENT dans votre base MySQL
+- Mot de passe haché avec bcrypt (sécurisé)
+- Token JWT généré après login
+- Pour émulateur Android : http://10.0.2.2:8000
+- Pour device physique : remplacer par votre IP locale
