@@ -47,7 +47,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('Accueil'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -66,41 +66,62 @@ class _DashboardPageState extends State<DashboardPage> {
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: () => authState.fetchCurrentUser(),
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24.0),
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Welcome card
+                  // Success icon
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check_circle,
+                      size: 100,
+                      color: Colors.green.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Success message
+                  Text(
+                    'BRAVO !',
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green.shade700,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Text(
+                    'Vous avez réussi',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.grey[700],
+                        ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // User name
                   Card(
                     elevation: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                            child: Icon(
-                              Icons.person,
-                              size: 50,
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           Text(
-                            'Bienvenue,',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            'Connecté en tant que :',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: Colors.grey[600],
                                 ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             user.fullName,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                             textAlign: TextAlign.center,
@@ -116,76 +137,20 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // User info details
-                  Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Informations du compte',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                          const Divider(height: 24),
-                          _buildInfoRow(
-                            context,
-                            icon: Icons.badge_outlined,
-                            label: 'ID',
-                            value: '#${user.id}',
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow(
-                            context,
-                            icon: Icons.person_outline,
-                            label: 'Prénom',
-                            value: user.prenom ?? 'Non renseigné',
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow(
-                            context,
-                            icon: Icons.person_outline,
-                            label: 'Nom',
-                            value: user.nom ?? 'Non renseigné',
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow(
-                            context,
-                            icon: Icons.email_outlined,
-                            label: 'Email',
-                            value: user.email,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 48),
 
                   // Logout button
-                  OutlinedButton.icon(
+                  ElevatedButton.icon(
                     onPressed: _handleLogout,
                     icon: const Icon(Icons.logout),
                     label: const Text('Se déconnecter'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                    ),
-                  ),
-
-                  // Pull to refresh hint
-                  const SizedBox(height: 24),
-                  Center(
-                    child: Text(
-                      'Tirez vers le bas pour rafraîchir',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[500],
-                          ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
                     ),
                   ),
                 ],
@@ -194,44 +159,6 @@ class _DashboardPageState extends State<DashboardPage> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildInfoRow(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
